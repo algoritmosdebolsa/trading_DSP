@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal
 
-"""     
-Scipy uses z**(-n) coefficients to generate both numerator and denominator: 
+"""
+Scipy uses z**(-n) coefficients to generate both numerator and denominator:
 [a,b,c,d,...] = a*z**(0) + b*z**(-1) + c*z**(-2) + d*z**(-3) ...
 """
 class Filter:
@@ -15,12 +15,14 @@ class Filter:
         self.fs = fs
         self.comments = comments
 
-        self.FreqResponse = scipy.signal.freqz(self.NumeratorZcoefs, 
+        self.w, self.complex = scipy.signal.freqz(self.NumeratorZcoefs, 
                                                self.DenominatorZcoefs)
-        self.frequency = self.FreqResponse[0]*self.fs/(2*np.pi)
+        
+        self.w, self.complex = self.w[1:], self.complex[1:]
+        self.frequency = self.w * self.fs / (2*np.pi)
         self.period = self.frequency**(-1)
-        self.dbpowergain = 20*np.log10(np.abs(np.array(self.FreqResponse[1])))
-        self.phase = np.angle(np.array(self.FreqResponse[1]))
+        self.dbpowergain = 20*np.log10(np.abs(self.complex))
+        self.phase = np.angle(self.complex)
     
     def __plotFig(self, x, y, xlabel, ylabel, title, plottype = "plot", 
                   xticks=None) -> None:
@@ -41,35 +43,35 @@ class Filter:
         
     def plotNormFreqResponse(self) -> None:
         ### rad/bar (Frequency) ###
-        self.__plotFig(x = self.FreqResponse[0]/np.pi, y = self.dbpowergain, 
-                       xlabel = 'Normalized frequency', ylabel = 'Gain (dB)',
+        self.__plotFig(x = self.frequency, y = self.dbpowergain, 
+                       xlabel = 'Frequency (cycles/sample)', ylabel = 'Gain (dB)',
                        title = 'Normalized Frequency Response')
     
     def plotFreqResponse(self) -> None:
         ### cycles/bar (Frequency), Log plot ###
         self.__plotFig(x = self.frequency, y = self.dbpowergain, 
-                       xlabel = 'Frequency (cycles/bar)', 
+                       xlabel = 'Frequency (cycles/sample)', 
                        ylabel = 'Gain (dB)', 
                        title = 'Frequency Response' , plottype = "semilog")
-        
+    
     def plotPeriodResponse(self) -> None:
         ### bars/cycle (Period), Log plot ###
         self.__plotFig(x = self.period, y = self.dbpowergain, 
-                       xlabel = 'Period (bars/cycle)', ylabel = 'Gain (dB)', 
+                       xlabel = 'Period (samples/cycle)', ylabel = 'Gain (dB)', 
                        title = 'Period Response', plottype = "semilog", 
                        xticks = [10,20,30,40,50])
     
     def plotPhaseResponse(self) -> None:
         ### Phase response ###
-        self.__plotFig(x = self.FreqResponse[0]/np.pi, y = self.phase,
-                       xlabel = 'Normalized frequency',
+        self.__plotFig(x = self.frequency, y = self.phase,
+                       xlabel = 'Frequency (cycles/sample)',
                        ylabel = 'Angle (radians)',
                        title = 'Phase Response')
         
     def plotGroupDelay(self) -> None:
         ### Group delay ###
-        w, gd = scipy.signal.group_delay((self.NumeratorZcoefs, self.DenominatorZcoefs))
-        self.__plotFig(x = w/np.pi, y = gd,
-                       xlabel = 'Normalized frequency',
+        _w, gd = scipy.signal.group_delay((self.NumeratorZcoefs, self.DenominatorZcoefs))
+        self.__plotFig(x = self.frequency, y = gd[1:],
+                       xlabel = 'Frequency (cycles/sample)',
                        ylabel = 'Group delay (samples)',
                        title = 'Group delay')

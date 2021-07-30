@@ -16,10 +16,10 @@ def main() -> None:
                   DenominatorZcoefs = [2,-2*c2,-2*c3], 
                   comments = "")
     
-    # filt.plotNormFreqResponse()
-    # filt.plotFreqResponse()
+    filt.plotNormFreqResponse()
+    filt.plotFreqResponse()
     filt.plotPeriodResponse()
-    # filt.plotPhaseResponse()
+    filt.plotPhaseResponse()
     filt.plotGroupDelay()
 
 if __name__ == '__main__':

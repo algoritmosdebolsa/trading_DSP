@@ -3,7 +3,6 @@ import numpy as np
 
 def main() -> None:
     
-### Ehlers 2nd order Butterworth filter ###
     fs = 1
     pc = 10 # Critical period
     a1 = np.exp(-np.sqrt(2)*np.pi/(fs*pc))
@@ -14,13 +13,13 @@ def main() -> None:
         
     filt = Filter(name = "Ehlers 2nd order Butterworth filter", 
                   NumeratorZcoefs = [c1], 
-                  DenominatorZcoefs = [1,-c2,-c3], 
+                  DenominatorZcoefs = [1,-c2,-c3],
                   comments = "")
     
-    # filt.plotNormFreqResponse()
-    # filt.plotFreqResponse()
+    filt.plotNormFreqResponse()
+    filt.plotFreqResponse()
     filt.plotPeriodResponse()
-    # filt.plotPhaseResponse()
+    filt.plotPhaseResponse()
     filt.plotGroupDelay()
 
 if __name__ == '__main__':
